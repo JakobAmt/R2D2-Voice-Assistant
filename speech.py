@@ -4,12 +4,16 @@ from audio import speak_text, play_audio_file
 from led import start_blue_fade, stop_blue_fade, red_led_on, red_led_off
 from brain import get_gemini_response, reset_chat
 from config import SOUNDS, WAKE_WORD
-from skills import weather
+from skills import weather, timer
 
 # --- Intent routing ---
 def route_command(text):
     if any(w in text for w in ["weather", "temperature", "rain", "forecast"]):
         return weather.get_weather()
+    elif any(w in text for w in ["time", "clock"]):
+        return timer.get_time()
+    elif any(w in text for w in ["date", "day", "today"]):
+        return timer.get_date()
     else:
         return get_gemini_response(text)
 

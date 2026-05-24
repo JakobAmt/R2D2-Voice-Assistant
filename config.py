@@ -6,9 +6,10 @@ load_dotenv()
 # --- API Keys ---
 GEMINI_API_KEY = os.getenv("GEMINI_API_KEY")
 ELEVENLABS_API_KEY = os.getenv("ELEVEN_LABS_API_KEY")
+OPENWEATHER_API_KEY = os.getenv("OPENWEATHER_API_KEY")
 
 # --- ElevenLabs ---
-ELEVENLABS_VOICE_ID = "2EiwWnXFnvU5JabPnv8n"
+ELEVENLABS_VOICE_ID = "XrExE9yKIg1WjnnlVkGX"
 ELEVENLABS_MODEL_ID = "eleven_multilingual_v2"
 ELEVENLABS_OUTPUT_FORMAT = "mp3_44100_128"
 
@@ -18,6 +19,10 @@ GEMINI_MODEL = "gemini-2.0-flash"
 # --- GPIO Pins ---
 BLUE_LED = 12
 RED_LED = 13
+
+# --- Weather API Settings ---
+WEATHER_CITY = "Oslo"
+WEATHER_UNITS = "metric"
 
 # --- Wake Word ---
 WAKE_WORD = "hey r2"

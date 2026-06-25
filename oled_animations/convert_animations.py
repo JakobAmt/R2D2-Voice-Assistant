@@ -33,8 +33,11 @@ frames1 = extract_frames('animation1.ino')
 frames2 = extract_frames('animation2.ino')
 frames3 = extract_frames('animation3.ino')
 frames4 = extract_frames('animation4.ino')
+frames5 = extract_frames('animation5.ino')
 
 save_frames(frames1, 'anim1.bin')
 save_frames(frames2, 'anim2.bin')
 save_frames(frames3, 'anim3.bin')
 save_frames(frames4, 'anim4.bin')
+save_frames(frames5, 'anim5.bin')
+

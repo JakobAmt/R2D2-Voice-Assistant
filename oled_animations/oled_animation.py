@@ -41,6 +41,7 @@ anim1 = load_frames('anim1.bin')
 anim2 = load_frames('anim2.bin')
 anim3 = load_frames('anim3.bin')
 anim4 = load_frames('anim4.bin')
+anim5 = load_frames('anim5.bin')
 
 print("Playing animations - Ctrl+C to stop")
 
@@ -54,6 +55,8 @@ try:
         play_animation(anim3, ANIM_DURATION)
         print("Playing animation 4...")
         play_animation(anim4, ANIM_DURATION)
+        print("Playing animation 5...")
+        play_animation(anim5, ANIM_DURATION)
 
 except KeyboardInterrupt:
     print("\nExiting.")

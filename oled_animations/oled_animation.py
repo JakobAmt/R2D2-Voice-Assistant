@@ -11,7 +11,7 @@ oled.fill(0)
 oled.show()
 
 FRAME_SIZE = 1024
-FRAME_DELAY = 0.1      # 100ms per frame
+FRAME_DELAY = 0.01      # 100ms per frame
 ANIM_DURATION = 10     # seconds per animation
 
 def load_frames(filename):

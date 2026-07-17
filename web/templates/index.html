@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>R2D2 Control Panel</title>
+    <link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>🤖 R2D2 Control Panel</h1>
+            <div class="status-badge" id="statusBadge">STANDBY</div>
+        </header>
+
+        <div class="grid">
+            <!-- System Stats -->
+            <div class="card">
+                <h2>System Status</h2>
+                <div class="stat-row">
+                    <span>CPU Temp</span>
+                    <span id="cpuTemp">--°C</span>
+                </div>
+                <div class="stat-row">
+                    <span>CPU Usage</span>
+                    <span id="cpuUsage">--%</span>
+                </div>
+                <div class="stat-row">
+                    <span>Memory</span>
+                    <span id="memUsage">--%</span>
+                </div>
+                <div class="stat-row">
+                    <span>Uptime</span>
+                    <span id="uptime">--</span>
+                </div>
+            </div>
+
+            <!-- Last Interaction -->
+            <div class="card">
+                <h2>Last Interaction</h2>
+                <div class="interaction">
+                    <div class="label">Command</div>
+                    <div class="value" id="lastCommand">None</div>
+                </div>
+                <div class="interaction">
+                    <div class="label">Response</div>
+                    <div class="value" id="lastResponse">None</div>
+                </div>
+            </div>
+
+            <!-- Controls -->
+            <div class="card">
+                <h2>Controls</h2>
+                <div class="button-grid">
+                    <button class="btn btn-danger" onclick="resetMemory()">Reset Memory</button>
+                </div>
+            </div>
+
+            <!-- Conversation Log -->
+            <div class="card full-width">
+                <h2>Conversation Log</h2>
+                <div class="log" id="conversationLog">
+                    <p class="empty">No conversation yet...</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function updateStatus() {
+            fetch('/api/status')
+                .then(r => r.json())
+                .then(data => {
+                    // Status badge
+                    const badge = document.getElementById('statusBadge');
+                    badge.textContent = data.status.toUpperCase();
+                    badge.className = 'status-badge ' + data.status;
+
+                    // System stats
+                    document.getElementById('cpuTemp').textContent = data.cpu_temp + '°C';
+                    document.getElementById('cpuUsage').textContent = data.cpu_usage + '%';
+                    document.getElementById('memUsage').textContent = data.memory_usage + '%';
+                    document.getElementById('uptime').textContent = data.uptime;
+
+                    // Last interaction
+                    document.getElementById('lastCommand').textContent = data.last_command || 'None';
+                    document.getElementById('lastResponse').textContent = data.last_response || 'None';
+
+                    // Conversation log
+                    const log = document.getElementById('conversationLog');
+                    if (data.conversation_history.length > 0) {
+                        log.innerHTML = data.conversation_history.map(entry => `
+                            <div class="log-entry ${entry.role}">
+                                <span class="log-time">${entry.time}</span>
+                                <span class="log-role">${entry.role === 'user' ? '👤' : '🤖'}</span>
+                                <span class="log-message">${entry.message}</span>
+                            </div>
+                        `).join('');
+                        log.scrollTop = log.scrollHeight;
+                    }
+                });
+        }
+
+        function resetMemory() {
+            fetch('/api/reset_memory', { method: 'POST' })
+                .then(r => r.json())
+                .then(data => {
+                    if (data.success) {
+                        document.getElementById('conversationLog').innerHTML = '<p class="empty">Memory reset.</p>';
+                    }
+                });
+        }
+
+        // Update every 2 seconds
+        updateStatus();
+        setInterval(updateStatus, 2000);
+    </script>
+</body>
+</html>

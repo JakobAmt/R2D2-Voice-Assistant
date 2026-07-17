@@ -14,7 +14,7 @@ ELEVENLABS_MODEL_ID = "eleven_multilingual_v2"
 ELEVENLABS_OUTPUT_FORMAT = "mp3_44100_128"
 
 # --- Gemini ---
-GEMINI_MODEL = "gemini-2.0-flash"
+GEMINI_MODEL = "models/gemini-3.5-flash"
 
 # --- GPIO Pins ---
 BLUE_LED = 12

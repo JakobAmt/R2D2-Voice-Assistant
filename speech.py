@@ -5,6 +5,7 @@ from led import start_blue_fade, stop_blue_fade, red_led_on, red_led_off
 from brain import get_gemini_response, reset_chat
 from config import SOUNDS, WAKE_WORD
 from skills import weather, timer
+from state import state, add_to_history
 
 # --- Intent routing ---
 def route_command(text):
@@ -29,6 +30,9 @@ def command_processor():
             recognizer.adjust_for_ambient_noise(source, duration=1)
             audio = recognizer.listen(source, timeout=8)
             text = recognizer.recognize_google(audio).lower()
+            state["last_command"] = text
+            state["status"] = "processing"
+
             print(f"You said: '{text}'")
 
             stop_blue_fade()
@@ -43,6 +47,10 @@ def command_processor():
 
             response = route_command(text)
             speak_text(response)
+            state["last_response"] = response
+            state["status"] = "speaking"
+            add_to_history("user", text)
+            add_to_history("assistant", response)
 
         except sr.WaitTimeoutError:
             stop_blue_fade()

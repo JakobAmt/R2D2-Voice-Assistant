@@ -3,6 +3,8 @@ import sys
 import os
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 from state import state, get_system_stats
+from skills import weather
+from skills.timer import get_time_raw, get_date_raw
 
 app = Flask(__name__)
 
@@ -18,18 +20,24 @@ def get_status():
         **stats,
     })
 
+@app.route('/api/clock')
+def get_clock():
+    return jsonify({
+        "time": get_time_raw(),
+        "date": get_date_raw(),
+    })
+
+@app.route('/api/weather')
+def get_weather():
+    return jsonify({
+        "weather": weather.get_weather()
+    })
+
 @app.route('/api/reset_memory', methods=['POST'])
 def reset_memory():
     from brain import reset_chat
     reset_chat()
     state["conversation_history"] = []
-    return jsonify({"success": True})
-
-@app.route('/api/set_status', methods=['POST'])
-def set_status():
-    data = request.json
-    if 'status' in data:
-        state["status"] = data['status']
     return jsonify({"success": True})
 
 if __name__ == '__main__':

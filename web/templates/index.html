@@ -56,6 +56,19 @@
                 </div>
             </div>
 
+            <!-- Clock -->
+            <div class="card">
+                <h2>Clock</h2>
+                <div class="clock-display" id="clockTime">--:-- --</div>
+                <div class="clock-date" id="clockDate">---</div>
+            </div>
+
+            <!-- Weather -->
+            <div class="card">
+                <h2>Weather</h2>
+                <div class="value" id="weatherData">Loading...</div>
+            </div>  
+
             <!-- Conversation Log -->
             <div class="card full-width">
                 <h2>Conversation Log</h2>
@@ -110,6 +123,30 @@
                     }
                 });
         }
+
+        function updateClock() {
+    fetch('/api/clock')
+        .then(r => r.json())
+        .then(data => {
+            document.getElementById('clockTime').textContent = data.time;
+            document.getElementById('clockDate').textContent = data.date;
+        });
+}
+
+        function updateWeather() {
+            fetch('/api/weather')
+                .then(r => r.json())
+                .then(data => {
+                    document.getElementById('weatherData').textContent = data.weather;
+                });
+        }
+
+        // Update clock every second, weather every 10 minutes
+        updateClock();
+        updateWeather();
+        setInterval(updateClock, 1000);
+        setInterval(updateWeather, 600000);
+
 
         // Update every 2 seconds
         updateStatus();

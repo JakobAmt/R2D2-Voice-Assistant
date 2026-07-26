@@ -4,8 +4,10 @@ from audio import speak_text, play_audio_file
 from led import start_blue_fade, stop_blue_fade, red_led_on, red_led_off
 from brain import get_gemini_response, reset_chat
 from config import SOUNDS, WAKE_WORD
-from skills import weather, timer
-from state import state, add_to_history
+from skills import weather
+from skills.timer import get_time, get_date
+from state import add_to_history, set_status, reset_history
+
 
 def extract_city(text):
     """Try to extract a city name from the command."""
@@ -31,7 +33,7 @@ def extract_city(text):
                 city = city.replace(ending, "")
             return city.strip().title()
     return None
-    
+
 # --- Intent routing ---
 def route_command(text):
     if any(w in text for w in ["weather", "temperature", "rain", "forecast"]):
@@ -55,45 +57,52 @@ def command_processor():
         print("Listening for command...")
         red_led_off()
         start_blue_fade()
+        set_status("listening")
         try:
             recognizer.adjust_for_ambient_noise(source, duration=1)
             audio = recognizer.listen(source, timeout=8)
             text = recognizer.recognize_google(audio).lower()
-            state["last_command"] = text
-            state["status"] = "processing"
-
             print(f"You said: '{text}'")
 
             stop_blue_fade()
             red_led_on()
+            set_status("processing")
+            add_to_history("user", text)
 
             if "thanks r2" in text or "thank you r2" in text:
                 speak_text("Always! I'm here to help.")
                 reset_chat()
+                reset_history()
                 start_blue_fade()
                 red_led_off()
+                set_status("standby")
                 return "END_CONVERSATION"
 
             response = route_command(text)
-            speak_text(response)
-            state["last_response"] = response
-            state["status"] = "speaking"
-            add_to_history("user", text)
+            set_status("speaking")
             add_to_history("assistant", response)
+            speak_text(response)
+            set_status("listening")
 
         except sr.WaitTimeoutError:
             stop_blue_fade()
+            set_status("standby")
             speak_text("I didn't hear anything. Please try again.")
         except sr.UnknownValueError:
             stop_blue_fade()
+            set_status("standby")
             speak_text("I couldn't understand that. Could you repeat?")
         except sr.RequestError:
             stop_blue_fade()
+            set_status("standby")
             speak_text("There was a problem with the speech service.")
         except Exception as e:
             stop_blue_fade()
+            set_status("standby")
             print(f"Unexpected error: {e}")
             speak_text("An unexpected error occurred.")
+    recognizer = sr.Recognizer()
+
 
 # --- Wake word listener ---
 def wake_word_listener():

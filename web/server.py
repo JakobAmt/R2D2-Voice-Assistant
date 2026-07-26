@@ -2,7 +2,7 @@ from flask import Flask, render_template, jsonify, request
 import sys
 import os
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
-from state import state, get_system_stats
+from state import get_state, get_system_stats, reset_history
 from skills import weather
 from skills.timer import get_time_raw, get_date_raw
 
@@ -14,11 +14,9 @@ def index():
 
 @app.route('/api/status')
 def get_status():
+    state = get_state()
     stats = get_system_stats()
-    return jsonify({
-        **state,
-        **stats,
-    })
+    return jsonify({**state, **stats})
 
 @app.route('/api/clock')
 def get_clock():
@@ -29,15 +27,13 @@ def get_clock():
 
 @app.route('/api/weather')
 def get_weather():
-    return jsonify({
-        "weather": weather.get_weather()
-    })
+    return jsonify({"weather": weather.get_weather()})
 
 @app.route('/api/reset_memory', methods=['POST'])
 def reset_memory():
     from brain import reset_chat
     reset_chat()
-    state["conversation_history"] = []
+    reset_history()
     return jsonify({"success": True})
 
 if __name__ == '__main__':

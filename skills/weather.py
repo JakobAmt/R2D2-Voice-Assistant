@@ -1,21 +1,25 @@
 import requests
-from config import OPENWEATHER_API_KEY, WEATHER_CITY, WEATHER_UNITS
+from config import OPENWEATHER_API_KEY
 
-def get_weather():
+DEFAULT_CITY = "Bekkestua"
+
+def get_weather(city=None):
+    if city is None:
+        city = DEFAULT_CITY
     try:
         url = "https://api.openweathermap.org/data/2.5/weather"
         params = {
-            "q": WEATHER_CITY,
+            "q": city,
             "appid": OPENWEATHER_API_KEY,
-            "units": WEATHER_UNITS,
+            "units": "metric",
         }
         response = requests.get(url, params=params)
         data = response.json()
 
         if response.status_code != 200:
-            return "I couldn't fetch the weather right now."
+            return f"I couldn't fetch the weather for {city}."
 
-        city = data["name"]
+        city_name = data["name"]
         temp = round(data["main"]["temp"])
         feels_like = round(data["main"]["feels_like"])
         description = data["weather"][0]["description"]
@@ -23,8 +27,8 @@ def get_weather():
         wind = round(data["wind"]["speed"])
 
         return (
-            f"Current weather in {city}: {description}, "
-            f"{temp} degrees with a feels like of {feels_like}. "
+            f"Current weather in {city_name}: {description}, "
+            f"{temp} degrees. "
             f"Humidity is {humidity} percent and wind speed is {wind} meters per second."
         )
 

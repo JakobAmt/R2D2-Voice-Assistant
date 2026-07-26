@@ -7,16 +7,45 @@ from config import SOUNDS, WAKE_WORD
 from skills import weather, timer
 from state import state, add_to_history
 
+def extract_city(text):
+    """Try to extract a city name from the command."""
+    # Common trigger phrases
+    triggers = [
+        "weather in ",
+        "weather for ",
+        "weather at ",
+        "temperature in ",
+        "temperature at ",
+        "what's the weather in ",
+        "what is the weather in ",
+        "how is the weather in ",
+        "how's the weather in ",
+    ]
+    text_lower = text.lower()
+    for trigger in triggers:
+        if trigger in text_lower:
+            # Extract everything after the trigger
+            city = text_lower.split(trigger)[-1].strip()
+            # Clean up common endings
+            for ending in [" today", " now", " like", " right now", "?"]:
+                city = city.replace(ending, "")
+            return city.strip().title()
+    return None
+    
 # --- Intent routing ---
 def route_command(text):
     if any(w in text for w in ["weather", "temperature", "rain", "forecast"]):
-        return weather.get_weather()
+        city = extract_city(text)
+        return weather.get_weather(city)  # None = use default
     elif any(w in text for w in ["time", "clock"]):
         return timer.get_time()
     elif any(w in text for w in ["date", "day", "today"]):
         return timer.get_date()
     else:
         return get_gemini_response(text)
+
+
+
 
 # --- Command processor ---
 def command_processor():

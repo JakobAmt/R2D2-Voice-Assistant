@@ -3,7 +3,12 @@ import random
 from audio import speak_text, play_audio_file
 from led import start_blue_fade, stop_blue_fade, red_led_on, red_led_off
 from brain import get_gemini_response, reset_chat
-from config import SOUNDS, WAKE_WORD
+from config import (
+    MAX_CONSECUTIVE_UNRECOGNIZED_COMMANDS,
+    SOUNDS,
+    SESSION_IDLE_TIMEOUT,
+    WAKE_WORD,
+)
 from skills import weather
 from skills.timer import get_time, get_date
 from state import add_to_history, set_status, reset_history
@@ -40,9 +45,9 @@ def route_command(text):
         city = extract_city(text)
         return weather.get_weather(city)  # None = use default
     elif any(w in text for w in ["time", "clock"]):
-        return timer.get_time()
+        return get_time()
     elif any(w in text for w in ["date", "day", "today"]):
-        return timer.get_date()
+        return get_date()
     else:
         return get_gemini_response(text)
 
@@ -50,7 +55,7 @@ def route_command(text):
 
 
 # --- Command processor ---
-def command_processor():
+def command_processor(unrecognized_attempts=0):
     recognizer = sr.Recognizer()
 
     with sr.Microphone() as source:
@@ -60,7 +65,7 @@ def command_processor():
         set_status("listening")
         try:
             recognizer.adjust_for_ambient_noise(source, duration=1)
-            audio = recognizer.listen(source, timeout=8)
+            audio = recognizer.listen(source, timeout=SESSION_IDLE_TIMEOUT)
             text = recognizer.recognize_google(audio).lower()
             print(f"You said: '{text}'")
 
@@ -87,11 +92,16 @@ def command_processor():
         except sr.WaitTimeoutError:
             stop_blue_fade()
             set_status("standby")
-            speak_text("I didn't hear anything. Please try again.")
+            speak_text("I didn't hear you. Say hey when you're ready to talk.")
+            return "END_CONVERSATION"
         except sr.UnknownValueError:
             stop_blue_fade()
             set_status("standby")
+            if unrecognized_attempts + 1 >= MAX_CONSECUTIVE_UNRECOGNIZED_COMMANDS:
+                speak_text("I couldn't understand that. Returning to wake word mode.")
+                return "END_CONVERSATION"
             speak_text("I couldn't understand that. Could you repeat?")
+            return "UNRECOGNIZED_COMMAND"
         except sr.RequestError:
             stop_blue_fade()
             set_status("standby")
@@ -123,10 +133,15 @@ def wake_word_listener():
                     stop_blue_fade()
                     play_audio_file(random.choice(SOUNDS))
 
+                    unrecognized_attempts = 0
                     while True:
-                        result = command_processor()
+                        result = command_processor(unrecognized_attempts)
+                        if result == "UNRECOGNIZED_COMMAND":
+                            unrecognized_attempts += 1
+                            continue
                         if result == "END_CONVERSATION":
                             break
+                        unrecognized_attempts = 0
 
                     print("Returning to wake word mode...")
                     start_blue_fade()

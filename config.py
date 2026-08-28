@@ -26,6 +26,8 @@ WEATHER_UNITS = "metric"
 
 # --- Wake Word ---
 WAKE_WORD = "hey r2"
+SESSION_IDLE_TIMEOUT = 5
+MAX_CONSECUTIVE_UNRECOGNIZED_COMMANDS = 2
 
 # --- R2D2 Sounds ---
 SOUNDS_FOLDER = "/home/jakob/Desktop/r2d2/R2 sounds/"
@@ -37,7 +39,7 @@ SOUNDS = [
 
 # --- System prompt ---
 SYSTEM_INSTRUCTION = (
-    "You are R2D2, a concise and friendly AI voice assistant. "
+    "You are R2D2, a concise and friendly AI voice assistant. Do not make any text noise effects like 'beep' or 'boop'. "
     "Respond conversationally without markdown or symbols. "
     "Keep answers short and direct."
 )

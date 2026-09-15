@@ -22,43 +22,25 @@ An R2D2-inspired AI voice assistant running on a Raspberry Pi 5, housed inside a
 
 ## Project Structure
 r2d2/
+
 ├── main.py # Entry point
-
 ├── config.py # Configuration
-
 ├── led.py # LED control (gpiozero/lgpio)
-
 ├── audio.py # Audio I/O
-
 ├── speech.py # Speech recognition / TTS
-
 ├── brain.py # AI / conversation logic (Gemini)
-
 ├── state.py # Shared state (state.json) between processes
-
 ├── oled_clock.py # OLED clock display
-
 ├── oled_animations.py # OLED animations
-
 ├── standby.py # Idle/standby behavior
-
 ├── convert_animations.py # Converts animation byte arrays to Python binaries
-
 ├── skills/
-
 │ ├── weather.py
-
 │ └── timer.py
-
 └── web/
-
 ├── server.py # Flask dashboard
-
 ├── templates/
-
 └── static/
-
-
 
 ## Setup
 ### Prerequisites

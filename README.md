@@ -67,6 +67,3 @@ The web dashboard will be available at `http://<pi-ip>:5000`.
 
 - [ ] Implement HUSB238 power delivery solution for stable power to Pi + servo
 
-## License
-
-MIT

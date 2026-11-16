@@ -7,6 +7,8 @@ import psutil
 from datetime import datetime
 from PIL import Image, ImageDraw, ImageFont
 import adafruit_ssd1306
+import signal, sys
+signal.signal(signal.SIGTERM, lambda *args: sys.exit(0))
 
 # --- Setup OLED ---
 i2c = busio.I2C(board.SCL, board.SDA)
